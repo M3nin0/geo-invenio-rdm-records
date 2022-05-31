@@ -24,6 +24,8 @@ from invenio_records_resources.records.systemfields import FilesField, \
 from invenio_requests.records.api import Request
 from invenio_requests.records.systemfields.relatedrecord import RelatedRecord
 from invenio_vocabularies.contrib.affiliations.api import Affiliation
+from invenio_vocabularies.contrib.awards.api import Award
+from invenio_vocabularies.contrib.funders.api import Funder
 from invenio_vocabularies.contrib.subjects.api import Subject
 from invenio_vocabularies.records.api import Vocabulary
 
@@ -74,7 +76,7 @@ class CommonFieldsMixin:
     parent_record_cls = RDMParent
 
     schema = ConstantField(
-       '$schema', 'local://records/record-v4.0.0.json')
+       '$schema', 'local://records/record-v5.0.0.json')
 
     dumper = ElasticsearchDumper(
         extensions=[
@@ -98,6 +100,20 @@ class CommonFieldsMixin:
             keys=['name'],
             pid_field=Affiliation.pid,
             cache_key='affiliations',
+        ),
+        funding_funder=PIDListRelation(
+            'metadata.funding',
+            relation_field='funder',
+            keys=['name'],
+            pid_field=Funder.pid,
+            cache_key='funders',
+        ),
+        funding_award=PIDListRelation(
+            'metadata.funding',
+            relation_field='award',
+            keys=['title', 'number', 'identifiers'],
+            pid_field=Award.pid,
+            cache_key='awards',
         ),
         languages=PIDListRelation(
             'metadata.languages',
@@ -218,7 +234,7 @@ class RDMDraft(CommonFieldsMixin, Draft):
     model_cls = models.RDMDraftMetadata
 
     index = IndexField(
-        "rdmrecords-drafts-draft-v4.0.0", search_alias="rdmrecords"
+        "rdmrecords-drafts-draft-v5.0.0", search_alias="rdmrecords"
     )
 
     files = FilesField(
@@ -252,7 +268,7 @@ class RDMRecord(CommonFieldsMixin, Record):
     model_cls = models.RDMRecordMetadata
 
     index = IndexField(
-        "rdmrecords-records-record-v4.0.0", search_alias="rdmrecords-records"
+        "rdmrecords-records-record-v5.0.0", search_alias="rdmrecords-records"
     )
 
     files = FilesField(
